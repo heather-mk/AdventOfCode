@@ -9,8 +9,9 @@ namespace AdventOfCode
 {
     class Day1
     {
+        // https://adventofcode.com/2021/day/1#part2
         private string _inputFilePath;
-        private const string _question = "How many measurements are larger than the previous measurment?";
+     
         public string InputFilePath
         {
             get
@@ -26,17 +27,14 @@ namespace AdventOfCode
                 _inputFilePath = value;
             }
         }
-        public string Question
-        {
-            get { return _question; }
-        }
+   
 
         public Day1(string inputPath)
         {
             InputFilePath = inputPath;
         }
 
-        public int GetAnswer()
+        public int GetAnswerPart1()
         {
             int prevReading = 0, curReading = 0, numIncreases = 0;
 
@@ -56,6 +54,48 @@ namespace AdventOfCode
                 }
                 sr.Close();
             }
+            return numIncreases;
+        }
+
+        public int GetAnswerPart2()
+        {
+            List<int> resultList = new List<int>();
+            List<int> window = new List<int>();
+            int curReading = 0, prevSum = 0, numIncreases = 0;
+
+            using (StreamReader sr = new StreamReader(InputFilePath))
+            {
+                while (!sr.EndOfStream)
+                {
+                    if (!int.TryParse(sr.ReadLine(), out curReading))
+                    {
+                        throw new ArgumentException("File path does not contain a parseable file.");
+                    }
+
+                    window.Add(curReading);
+                    if (window.Count >= 3)
+                    {
+                        // sum the readings and add to results
+                        if (window.Count > 3)
+                        {
+                            window.RemoveAt(0);
+                        }
+                        resultList.Add(window.Sum());
+                    }
+                }
+                sr.Close();
+            }
+
+            // iterate through results to find increases and decreases
+            foreach(int curSum in resultList)
+            {
+                if(prevSum != 0 && curSum > prevSum)
+                {
+                    numIncreases++;
+                }
+                prevSum = curSum;
+            }
+
             return numIncreases;
         }
     }
